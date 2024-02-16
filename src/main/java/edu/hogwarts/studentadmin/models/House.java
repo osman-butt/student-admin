@@ -13,6 +13,13 @@ public class House {
     private String name;
     private String founder;
 
+    public House() {}
+
+    public House(String name, String founder) {
+        this.name = name;
+        this.founder = founder;
+    }
+
     public int getId() {
         return id;
     }
