@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/courses")
@@ -151,6 +152,51 @@ public class CourseController {
                 } else {
                     return ResponseEntity.notFound().build();
                 }
+            }
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Course> deleteCourse(@PathVariable int id) {
+        Optional<Course> course = courseRepository.findById(id);
+        if (course.isPresent()) {
+            courseRepository.deleteById(id);
+            return ResponseEntity.of(course);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("{id}/teacher")
+    public ResponseEntity<Course> removeTeacherFromCourse(@PathVariable int id) {
+        Optional<Course> course = courseRepository.findById(id);
+        if (course.isPresent()) {
+            Course origCourse = course.get();
+            origCourse.setTeacher(null);
+            Course updatedCourse = courseRepository.save(origCourse);
+            return ResponseEntity.ok().body(updatedCourse);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("{id}/students/{studentId}")
+    public ResponseEntity<Course> removeStudentFromCourse(@PathVariable int id, @PathVariable int studentId) {
+        Optional<Course> course = courseRepository.findById(id);
+        if (course.isPresent()) {
+            Course origCourse = course.get();
+            // Check if student is enrolled
+            if(isStudentPresent(origCourse.getStudents(),studentId)) {
+                List<Student> newStudentList = origCourse.getStudents().stream()
+                        .filter(student -> student.getId() != studentId)
+                        .collect(Collectors.toList());
+                origCourse.setStudents(newStudentList);
+                Course updatedCourse = courseRepository.save(origCourse);
+                return ResponseEntity.ok().body(updatedCourse);
+            } else {
+                return ResponseEntity.notFound().build();
             }
         } else {
             return ResponseEntity.notFound().build();
