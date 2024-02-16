@@ -57,5 +57,11 @@ public class InitData implements CommandLineRunner {
         teacherRepository.saveAll(List.of(snape));
 
         // Create Course
+        Course potions = new Course();
+        potions.setSubject("Potions");
+        potions.setCurrent(true);
+        potions.setTeacher(snape);
+        potions.setStudents(List.of(harry,ron,hermione,padma,draco,crabbe,goyle,justin,seamus,neville));
+        courseRepository.saveAll(List.of(potions));
     }
 }
