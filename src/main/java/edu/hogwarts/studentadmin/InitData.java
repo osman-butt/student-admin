@@ -1,9 +1,6 @@
 package edu.hogwarts.studentadmin;
 
-import edu.hogwarts.studentadmin.models.EmpType;
-import edu.hogwarts.studentadmin.models.House;
-import edu.hogwarts.studentadmin.models.Student;
-import edu.hogwarts.studentadmin.models.Teacher;
+import edu.hogwarts.studentadmin.models.*;
 import edu.hogwarts.studentadmin.repositories.CourseRepository;
 import edu.hogwarts.studentadmin.repositories.HouseRepository;
 import edu.hogwarts.studentadmin.repositories.StudentRepository;
@@ -40,8 +37,20 @@ public class InitData implements CommandLineRunner {
         houseRepository.saveAll(List.of(gryffindor,hufflepuff,ravenclaw,slytherin));
 
         // Create students
-        Student harry  = new Student("Harry","James","Potter", LocalDate.parse("1980-01-05"),gryffindor,false,1991,1999,false);
-        studentRepository.saveAll(List.of(harry));
+        Student harry  = new Student("Harry","James","Potter", LocalDate.parse("1980-01-05"),gryffindor,false,1991,null,false);
+        Student ron = new Student("Ron",null,"Weasley",LocalDate.parse("1981-02-12"),gryffindor,false,1991,null,false);
+        Student hermione = new Student("Hermione",null,"Granger",LocalDate.parse("1981-01-23"),gryffindor,true,1991,null,false);
+        Student padma = new Student("Padma",null,"Patil",LocalDate.parse("1979-08-19"),ravenclaw,true,1991,null,false);
+        Student draco = new Student("Draco",null,"Malfoy",LocalDate.parse("1979-09-11"),slytherin,true,1991,null,false);
+        Student crabbe = new Student("Vincent",null,"Crabbe",LocalDate.parse("1980-03-21"),slytherin,false,1991,null,false);
+        Student goyle = new Student("Gregory",null,"Goyle",LocalDate.parse("1981-06-22"),slytherin,false,1991,null,false);
+        Student justin = new Student("Justin",null,"Finch-Fletchley",LocalDate.parse("1981-01-27"),hufflepuff,false,1991,null,false);
+        Student seamus = new Student("Seamus",null,"Finnigan",LocalDate.parse("1979-11-01"),gryffindor,false,1991,null,false);
+        Student neville = new Student("Neville",null,"Longbottom",LocalDate.parse("1980-01-09"),gryffindor,false,1991,null,false);
+        Student parvati = new Student("Parvati",null,"Patil",LocalDate.parse("1980-06-06"),gryffindor,true,1991,null,false);
+        Student pansy = new Student("Pansy",null,"Parkinson",LocalDate.parse("1980-07-04"),slytherin,true,1991,null,false);
+
+        studentRepository.saveAll(List.of(harry,ron,hermione,padma,draco,crabbe,goyle,justin,seamus,neville,parvati,pansy));
 
         // Create teachers
         Teacher snape = new Teacher("Severus",null,"Snape",LocalDate.parse("1946-06-29"),slytherin,true, EmpType.TENURED,LocalDate.parse("1980-01-01"),null);
