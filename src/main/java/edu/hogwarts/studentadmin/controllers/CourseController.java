@@ -30,8 +30,9 @@ public class CourseController {
     }
 
     @GetMapping
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
+    public ResponseEntity<List<Course>> getAllCourses() {
+        List<Course> courses = courseRepository.findAll();
+        return ResponseEntity.ok(courses);
     }
 
     @GetMapping("{id}")
@@ -77,9 +78,9 @@ public class CourseController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Course createCourse(@RequestBody Course course) {
-        return courseRepository.save(course);
+    public ResponseEntity<Course> createCourse(@RequestBody Course course) {
+        Course newCourse = courseRepository.save(course);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCourse);
     }
 
     @PutMapping({"{id}"})

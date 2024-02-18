@@ -24,8 +24,9 @@ public class TeacherController {
     }
 
     @GetMapping
-    public List<Teacher> getAllTeachers() {
-        return teacherRepository.findAll();
+    public ResponseEntity<List<Teacher>> getAllTeachers() {
+        List<Teacher> teachers = teacherRepository.findAll();
+        return ResponseEntity.ok(teachers);
     }
 
     @GetMapping("{id}")
@@ -35,9 +36,9 @@ public class TeacherController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Teacher createTeacher(@RequestBody Teacher teacher) {
-        return teacherRepository.save(teacher);
+    public ResponseEntity<Teacher> createTeacher(@RequestBody Teacher teacher) {
+        Teacher newTeacher = teacherRepository.save(teacher);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newTeacher);
     }
 
     @PutMapping("{id}")
