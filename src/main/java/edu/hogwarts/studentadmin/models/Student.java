@@ -1,8 +1,12 @@
 package edu.hogwarts.studentadmin.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Student {
@@ -21,6 +25,10 @@ public class Student {
     @Column(nullable = true)
     private Integer graduationYear;
     private boolean graduated;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "students")
+    private Set<Course> courses = new HashSet<>();
 
     public Student() {}
 
@@ -114,5 +122,13 @@ public class Student {
 
     public void setGraduated(boolean graduated) {
         this.graduated = graduated;
+    }
+
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
     }
 }

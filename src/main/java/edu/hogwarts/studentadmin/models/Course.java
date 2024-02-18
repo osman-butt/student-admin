@@ -2,7 +2,8 @@ package edu.hogwarts.studentadmin.models;
 
 import jakarta.persistence.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Course {
@@ -17,9 +18,9 @@ public class Course {
     @ManyToMany
     @JoinTable(
             name = "course_students",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id"))
-    private List<Student> students;
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "student_id"))
+    private Set<Student> students = new HashSet<>();
 
     public int getId() {
         return id;
@@ -57,11 +58,23 @@ public class Course {
         this.teacher = teacher;
     }
 
-    public List<Student> getStudents() {
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Set<Student> getStudents() {
         return students;
     }
 
-    public void setStudents(List<Student> students) {
+    public void setStudents(Set<Student> students) {
         this.students = students;
+    }
+
+    public void addStudent(Student student) {
+        this.students.add(student);
+    }
+
+    public void removeStudent(Student student) {
+        this.students.remove(student);
     }
 }
