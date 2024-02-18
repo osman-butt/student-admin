@@ -9,7 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Component
 public class InitData implements CommandLineRunner {
@@ -34,7 +34,7 @@ public class InitData implements CommandLineRunner {
         House hufflepuff = new House("Hufflepuff","Helga Hufflepuff");
         House ravenclaw = new House("Ravenclaw","Rowena Ravenclaw");
         House slytherin = new House("Slytherin","Salazar Slytherin");
-        houseRepository.saveAll(List.of(gryffindor,hufflepuff,ravenclaw,slytherin));
+        houseRepository.saveAll(Set.of(gryffindor,hufflepuff,ravenclaw,slytherin));
 
         // Create students
         Student harry  = new Student("Harry","James","Potter", LocalDate.parse("1980-01-05"),gryffindor,false,1991,null,false);
@@ -50,18 +50,18 @@ public class InitData implements CommandLineRunner {
         Student parvati = new Student("Parvati",null,"Patil",LocalDate.parse("1980-06-06"),gryffindor,true,1991,null,false);
         Student pansy = new Student("Pansy",null,"Parkinson",LocalDate.parse("1980-07-04"),slytherin,true,1991,null,false);
 
-        studentRepository.saveAll(List.of(harry,ron,hermione,padma,draco,crabbe,goyle,justin,seamus,neville,parvati,pansy));
+        studentRepository.saveAll(Set.of(harry,ron,hermione,padma,draco,crabbe,goyle,justin,seamus,neville,parvati,pansy));
 
         // Create teachers
         Teacher snape = new Teacher("Severus",null,"Snape",LocalDate.parse("1946-06-29"),slytherin,true, EmpType.TENURED,LocalDate.parse("1980-01-01"),null);
-        teacherRepository.saveAll(List.of(snape));
+        teacherRepository.saveAll(Set.of(snape));
 
         // Create Course
         Course potions = new Course();
         potions.setSubject("Potions");
         potions.setCurrent(true);
         potions.setTeacher(snape);
-        potions.setStudents(List.of(harry,ron,hermione,padma,draco,crabbe,goyle,justin,seamus,neville));
-        courseRepository.saveAll(List.of(potions));
+        potions.setStudents(Set.of(harry,ron,hermione,padma,draco,crabbe,goyle,justin,seamus,neville));
+        courseRepository.saveAll(Set.of(potions));
     }
 }
