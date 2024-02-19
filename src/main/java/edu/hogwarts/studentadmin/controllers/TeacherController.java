@@ -68,8 +68,14 @@ public class TeacherController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Teacher> deleteTeacher(@PathVariable int id) {
-        Optional<Teacher> teacher = teacherRepository.findById(id);
-        teacherRepository.deleteById(id);
-        return ResponseEntity.of(teacher);
+        Optional<Teacher> teacherOptional = teacherRepository.findById(id);
+        if( teacherOptional.isPresent()) {
+            Teacher teacher = teacherOptional.get();
+            // Remove student from courses
+            teacher.getCourses().forEach(course -> course.setTeacher(null));
+            // Delete the student entity
+            teacherRepository.delete(teacher);
+        }
+        return ResponseEntity.noContent().build();
     }
 }
