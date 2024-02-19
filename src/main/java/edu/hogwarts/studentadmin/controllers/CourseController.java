@@ -11,9 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -60,11 +58,11 @@ public class CourseController {
     }
 
     @GetMapping("{id}/students")
-    public ResponseEntity<List<Student>> getCourseStudents(@PathVariable int id) {
+    public ResponseEntity<Set<Student>> getCourseStudents(@PathVariable int id) {
         Optional<Course> courseOptional = courseRepository.findById(id);
         if (courseOptional.isPresent()) {
             Course course = courseOptional.get();
-            List<Student> students = course.getStudents();
+            Set<Student> students = course.getStudents();
             if (!students.isEmpty()) {
                 return ResponseEntity.ok(students);
             } else {
@@ -85,11 +83,11 @@ public class CourseController {
 
     @PutMapping({"{id}"})
     public ResponseEntity<Course> updateCourse(@PathVariable int id, @RequestBody Course course) {
-        Optional<Course> original = courseRepository.findById(id);
-        if (original.isPresent()) {
-            Course origCourse = original.get();
+        Optional<Course> courseOptional = courseRepository.findById(id);
+        if (courseOptional.isPresent()) {
+            Course origCourse = courseOptional.get();
             // Update course students
-            List<Student> updatedStudents = new ArrayList<>();
+            Set<Student> updatedStudents = new HashSet<>();
             for (Student student : course.getStudents()) {
                 Optional<Student> foundStudent = studentRepository.findById(student.getId());
                 foundStudent.ifPresent(updatedStudents::add);
@@ -117,14 +115,14 @@ public class CourseController {
 
     @PutMapping("{id}/teacher")
     public ResponseEntity<Course> updateCourseTeacher(@PathVariable int id, @RequestBody Teacher teacher) {
-        Optional<Course> original = courseRepository.findById(id);
-        if (original.isPresent()) {
-            Course origCourse = original.get();
+        Optional<Course> courseOptional = courseRepository.findById(id);
+        if (courseOptional.isPresent()) {
+            Course course = courseOptional.get();
             // Update teacher
-            Optional<Teacher> foundTeacher = teacherRepository.findById(teacher.getId());
-            if(foundTeacher.isPresent()) {
-                origCourse.setTeacher(foundTeacher.get());
-                Course updatedCourse = courseRepository.save(origCourse);
+            Optional<Teacher> optionalTeacher = teacherRepository.findById(teacher.getId());
+            if(optionalTeacher.isPresent()) {
+                course.setTeacher(optionalTeacher.get());
+                Course updatedCourse = courseRepository.save(course);
                 return ResponseEntity.ok().body(updatedCourse);
             } else {
                 return ResponseEntity.notFound().build();
@@ -136,19 +134,19 @@ public class CourseController {
 
     @PutMapping("{id}/students/{studentId}")
     public ResponseEntity<Course> addStudentToCourse(@PathVariable int id, @PathVariable int studentId) {
-        Optional<Course> original = courseRepository.findById(id);
-        if(original.isPresent()) {
-            Course origCourse = original.get();
+        Optional<Course> courseOptional = courseRepository.findById(id);
+        if(courseOptional.isPresent()) {
+            Course course = courseOptional.get();
             // Check if student is already enrolled
-            if(isStudentPresent(origCourse.getStudents(),studentId)) {
-                return ResponseEntity.ok().body(origCourse);
+            if(isStudentPresent(course.getStudents(),studentId)) {
+                return ResponseEntity.ok().body(course);
             } else {
-                List<Student> newStudentList = origCourse.getStudents();
+                Set<Student> newStudentList = course.getStudents();
                 Optional<Student> foundStudent = studentRepository.findById(studentId);
                 if(foundStudent.isPresent()) {
                     newStudentList.add(foundStudent.get());
-                    origCourse.setStudents(newStudentList);
-                    Course updatedCourse = courseRepository.save(origCourse);
+                    course.setStudents(newStudentList);
+                    Course updatedCourse = courseRepository.save(course);
                     return ResponseEntity.ok().body(updatedCourse);
                 } else {
                     return ResponseEntity.notFound().build();
@@ -161,10 +159,10 @@ public class CourseController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Course> deleteCourse(@PathVariable int id) {
-        Optional<Course> course = courseRepository.findById(id);
-        if (course.isPresent()) {
+        Optional<Course> courseOptional = courseRepository.findById(id);
+        if (courseOptional.isPresent()) {
             courseRepository.deleteById(id);
-            return ResponseEntity.of(course);
+            return ResponseEntity.of(courseOptional);
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -172,12 +170,12 @@ public class CourseController {
 
     @DeleteMapping("{id}/teacher")
     public ResponseEntity<Course> removeTeacherFromCourse(@PathVariable int id) {
-        Optional<Course> course = courseRepository.findById(id);
-        if (course.isPresent()) {
-            Course origCourse = course.get();
-            origCourse.setTeacher(null);
-            Course updatedCourse = courseRepository.save(origCourse);
-            return ResponseEntity.ok().body(updatedCourse);
+        Optional<Course> courseOptional = courseRepository.findById(id);
+        if (courseOptional.isPresent()) {
+            Course course = courseOptional.get();
+            course.setTeacher(null);
+            courseRepository.save(course);
+            return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -185,17 +183,17 @@ public class CourseController {
 
     @DeleteMapping("{id}/students/{studentId}")
     public ResponseEntity<Course> removeStudentFromCourse(@PathVariable int id, @PathVariable int studentId) {
-        Optional<Course> course = courseRepository.findById(id);
-        if (course.isPresent()) {
-            Course origCourse = course.get();
+        Optional<Course> courseOptional = courseRepository.findById(id);
+        if (courseOptional.isPresent()) {
+            Course course = courseOptional.get();
             // Check if student is enrolled
-            if(isStudentPresent(origCourse.getStudents(),studentId)) {
-                List<Student> newStudentList = origCourse.getStudents().stream()
+            if(isStudentPresent(course.getStudents(),studentId)) {
+                Set<Student> newStudentList = course.getStudents().stream()
                         .filter(student -> student.getId() != studentId)
-                        .collect(Collectors.toList());
-                origCourse.setStudents(newStudentList);
-                Course updatedCourse = courseRepository.save(origCourse);
-                return ResponseEntity.ok().body(updatedCourse);
+                        .collect(Collectors.toSet());
+                course.setStudents(newStudentList);
+                courseRepository.save(course);
+                return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -206,12 +204,7 @@ public class CourseController {
 
 
     // Check if student is already enrolled in course
-    private boolean isStudentPresent(List<Student> students, int id) {
-        for (Student student : students) {
-            if (student.getId() == id) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isStudentPresent(Set<Student> students, int id) {
+        return students.stream().anyMatch(student -> student.getId() == id);
     }
 }
