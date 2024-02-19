@@ -27,13 +27,13 @@ public class InitData implements CommandLineRunner {
     }
 
     public void run(String... args) {
-        System.out.println("InitData is running");
+        System.out.println("Adding initial data to DB.");
 
         // Create houses
-        House gryffindor = new House("Gryffindor","Godric Gryffindor");
-        House hufflepuff = new House("Hufflepuff","Helga Hufflepuff");
-        House ravenclaw = new House("Ravenclaw","Rowena Ravenclaw");
-        House slytherin = new House("Slytherin","Salazar Slytherin");
+        House gryffindor = new House("Gryffindor","Godric Gryffindor",new HouseColor(ColorType.RED,ColorType.YELLOW));
+        House hufflepuff = new House("Hufflepuff","Helga Hufflepuff",new HouseColor(ColorType.YELLOW,ColorType.BLACK));
+        House ravenclaw = new House("Ravenclaw","Rowena Ravenclaw",new HouseColor(ColorType.BLUE,ColorType.BRONZE));
+        House slytherin = new House("Slytherin","Salazar Slytherin",new HouseColor(ColorType.YELLOW,ColorType.BLACK));
         houseRepository.saveAll(Set.of(gryffindor,hufflepuff,ravenclaw,slytherin));
 
         // Create students
