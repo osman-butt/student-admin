@@ -1,8 +1,11 @@
 package edu.hogwarts.studentadmin.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Teacher {
@@ -20,6 +23,10 @@ public class Teacher {
     private EmpType employment;
     private LocalDate employmentStart;
     private LocalDate employmentEnd;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "teacher")
+    private Set<Course> courses = new HashSet<>();
 
     public Teacher() {}
 
@@ -109,5 +116,17 @@ public class Teacher {
 
     public void setEmploymentEnd(LocalDate employmentEnd) {
         this.employmentEnd = employmentEnd;
+    }
+
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
+    }
+
+    public void addCourse(Course course) {
+        this.courses.add(course);
     }
 }
