@@ -1,4 +1,4 @@
-package edu.hogwarts.studentadmin.services;
+package edu.hogwarts.studentadmin.services.impl;
 
 import edu.hogwarts.studentadmin.exceptions.NotFoundException;
 import edu.hogwarts.studentadmin.models.House;
@@ -6,13 +6,14 @@ import edu.hogwarts.studentadmin.models.Student;
 import edu.hogwarts.studentadmin.models.Teacher;
 import edu.hogwarts.studentadmin.repositories.HouseRepository;
 import edu.hogwarts.studentadmin.repositories.TeacherRepository;
+import edu.hogwarts.studentadmin.services.TeacherService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TeacherServiceImpl implements TeacherService{
+public class TeacherServiceImpl implements TeacherService {
     private final TeacherRepository teacherRepository;
     private final HouseRepository houseRepository;
 

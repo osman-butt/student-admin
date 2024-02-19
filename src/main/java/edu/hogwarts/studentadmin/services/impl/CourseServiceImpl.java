@@ -1,4 +1,4 @@
-package edu.hogwarts.studentadmin.services;
+package edu.hogwarts.studentadmin.services.impl;
 
 import edu.hogwarts.studentadmin.exceptions.NotFoundException;
 import edu.hogwarts.studentadmin.models.Course;
@@ -7,6 +7,7 @@ import edu.hogwarts.studentadmin.models.Teacher;
 import edu.hogwarts.studentadmin.repositories.CourseRepository;
 import edu.hogwarts.studentadmin.repositories.StudentRepository;
 import edu.hogwarts.studentadmin.repositories.TeacherRepository;
+import edu.hogwarts.studentadmin.services.CourseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class CourseServiceImpl implements CourseService{
+public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
     private final StudentRepository studentRepository;
