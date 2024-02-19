@@ -15,9 +15,9 @@ public interface CourseService {
     Set<Student> getCourseStudentsById(int id);
     Course createCourse(Course course);
     Course updateCourse(int id, Course course);
-    Course updateCourseTeacherById(int id);
+    Course updateCourseTeacher(int id, int teacherId);
     Course addStudentToCourse(int id, int studentId);
     void deleteCourse(int id);
-    void deleteTeacherFromCourse(int id);
-    void deleteStudentFromCourse(int id, int studentId);
+    Course removeTeacherFromCourse(int id);
+    Course removeStudentFromCourse(int id, int studentId);
 }
