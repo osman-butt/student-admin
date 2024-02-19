@@ -1,6 +1,8 @@
 package edu.hogwarts.studentadmin.services;
 
+import edu.hogwarts.studentadmin.exceptions.NotFoundException;
 import edu.hogwarts.studentadmin.models.House;
+import edu.hogwarts.studentadmin.models.Student;
 import edu.hogwarts.studentadmin.models.Teacher;
 import edu.hogwarts.studentadmin.repositories.HouseRepository;
 import edu.hogwarts.studentadmin.repositories.TeacherRepository;
@@ -25,7 +27,12 @@ public class TeacherServiceImpl implements TeacherService{
 
     @Override
     public Optional<Teacher> getTeacherById(int id) {
-        return teacherRepository.findById(id);
+        Optional<Teacher> teacherOptional = teacherRepository.findById(id);
+        if (teacherOptional.isPresent()) {
+            return teacherOptional;
+        } else {
+            throw new NotFoundException("Unable to find teacher with id=" + id);
+        }
     }
 
     @Override
@@ -41,7 +48,11 @@ public class TeacherServiceImpl implements TeacherService{
             // Get house
             House newHouse = teacher.getHouse();
             Optional<House> house = houseRepository.findById(newHouse.getId());
-            house.ifPresent(origTeacher::setHouse);
+            if (house.isPresent()) {
+                origTeacher.setHouse(teacher.getHouse());
+            } else {
+                throw new NotFoundException("Unable to find house with id=" + teacher.getHouse().getId());
+            }
             // Update Teacher
             origTeacher.setFirstName(teacher.getFirstName());
             origTeacher.setMiddleName(teacher.getMiddleName());
@@ -53,7 +64,7 @@ public class TeacherServiceImpl implements TeacherService{
             origTeacher.setHeadOfHouse(teacher.isHeadOfHouse());
             return teacherRepository.save(origTeacher);
         } else {
-            throw new RuntimeException("Teacher with id "+ id + "not found.");
+            throw new NotFoundException("Unable to find teacher with id=" + id);
         }
     }
 
@@ -67,7 +78,7 @@ public class TeacherServiceImpl implements TeacherService{
             // Delete the student entity
             teacherRepository.delete(teacher);
         } else {
-            throw new RuntimeException("Teacher with id "+ id + "not found.");
+            throw new NotFoundException("Unable to find teacher with id=" + id);
         }
     }
 }

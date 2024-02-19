@@ -1,5 +1,6 @@
 package edu.hogwarts.studentadmin.services;
 
+import edu.hogwarts.studentadmin.exceptions.NotFoundException;
 import edu.hogwarts.studentadmin.models.House;
 import edu.hogwarts.studentadmin.models.Student;
 import edu.hogwarts.studentadmin.repositories.HouseRepository;
@@ -26,7 +27,12 @@ public class StudentServiceImpl implements StudentService{
 
     @Override
     public Optional<Student> getStudentById(int id) {
-        return studentRepository.findById(id);
+        Optional<Student> studentOptional = studentRepository.findById(id);
+        if (studentOptional.isPresent()) {
+            return studentOptional;
+        } else {
+            throw new NotFoundException("Unable to find student with id=" + id);
+        }
     }
 
     @Override
@@ -45,7 +51,7 @@ public class StudentServiceImpl implements StudentService{
             if (house.isPresent()) {
                 house.ifPresent(origStudent::setHouse);
             } else {
-                throw new RuntimeException("Unable to find house with" + student.getHouse().getId());
+                throw new NotFoundException("Unable to find house with id=" + student.getHouse().getId());
             }
             // Update student info
             origStudent.setFirstName(student.getFirstName());
@@ -58,7 +64,7 @@ public class StudentServiceImpl implements StudentService{
             origStudent.setGraduationYear(student.getGraduationYear());
             return studentRepository.save(origStudent);
         } else {
-            throw new RuntimeException("Unable to find student with" + id);
+            throw new NotFoundException("Unable to find student with id=" + id);
         }
     }
 
@@ -72,7 +78,7 @@ public class StudentServiceImpl implements StudentService{
             // Delete the student entity
             studentRepository.delete(student);
         } else {
-            throw new RuntimeException("Student with "+ id + " is not found.");
+            throw new NotFoundException("Unable to find student with id=" + id);
         }
     }
 }
