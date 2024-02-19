@@ -47,11 +47,11 @@ public class TeacherServiceImpl implements TeacherService{
             Teacher origTeacher = original.get();
             // Get house
             House newHouse = teacher.getHouse();
-            Optional<House> house = houseRepository.findById(newHouse.getId());
+            Optional<House> house = houseRepository.findByName(newHouse.getName());
             if (house.isPresent()) {
                 origTeacher.setHouse(teacher.getHouse());
             } else {
-                throw new NotFoundException("Unable to find house with id=" + teacher.getHouse().getId());
+                throw new NotFoundException("Unable to find house named " + teacher.getHouse().getName());
             }
             // Update Teacher
             origTeacher.setFirstName(teacher.getFirstName());

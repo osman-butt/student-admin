@@ -1,16 +1,12 @@
 package edu.hogwarts.studentadmin.models;
 
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 
-import java.util.Set;
-
 @Entity
 public class House {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
     private String name;
     private String founder;
     @JsonSerialize
@@ -29,10 +25,6 @@ public class House {
         this.colors = colors;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public String getName() {
         return name;
     }
@@ -49,7 +41,11 @@ public class House {
         this.founder = founder;
     }
 
-    public String colorsToString() {
-        return colors.getPrimaryColor() + ", " +colors.getSecondaryColor();
+    public HouseColor getColors() {
+        return colors;
+    }
+
+    public void setColors(HouseColor colors) {
+        this.colors = colors;
     }
 }

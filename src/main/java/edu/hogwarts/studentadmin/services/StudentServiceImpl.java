@@ -11,15 +11,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class StudentServiceImpl implements StudentService{
     private final StudentRepository studentRepository;
     private final HouseRepository houseRepository;
 
-    public StudentServiceImpl(StudentRepository studentRepository,HouseRepository houseRepository) {
+    public StudentServiceImpl(StudentRepository studentRepository, HouseRepository houseRepository) {
         this.studentRepository = studentRepository;
         this.houseRepository = houseRepository;
     }
+
     @Override
     public Student createStudent(Student student) {
         return studentRepository.save(student);
@@ -37,6 +40,7 @@ public class StudentServiceImpl implements StudentService{
 
     @Override
     public List<Student> getAllStudents() {
+//        return studentRepository.findAll().stream().map(studentDTOMapper).collect(Collectors.toList());
         return studentRepository.findAll();
     }
 
@@ -47,11 +51,11 @@ public class StudentServiceImpl implements StudentService{
             Student origStudent = original.get();
             // Set house
             House newHouse = student.getHouse();
-            Optional<House> house = houseRepository.findById(newHouse.getId());
+            Optional<House> house = houseRepository.findByName(newHouse.getName());
             if (house.isPresent()) {
                 house.ifPresent(origStudent::setHouse);
             } else {
-                throw new NotFoundException("Unable to find house with id=" + student.getHouse().getId());
+                throw new NotFoundException("Unable to find house named " + student.getHouse().getName());
             }
             // Update student info
             origStudent.setFirstName(student.getFirstName());
