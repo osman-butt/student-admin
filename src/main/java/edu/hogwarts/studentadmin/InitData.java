@@ -62,6 +62,11 @@ public class InitData implements CommandLineRunner {
         potions.setCurrent(true);
         potions.setTeacher(snape);
         potions.setStudents(Set.of(harry,ron,hermione,padma,draco,crabbe,goyle,justin,seamus,neville));
-        courseRepository.saveAll(Set.of(potions));
+        Course darkArts = new Course();
+        darkArts.setSubject("Dark arts");
+        darkArts.setCurrent(true);
+        darkArts.setTeacher(snape);
+        darkArts.setStudents(Set.of(harry,ron,hermione));
+        courseRepository.saveAll(Set.of(potions,darkArts));
     }
 }
