@@ -45,11 +45,11 @@ public class StudentController {
         Optional<Student> original = studentRepository.findById(id);
         if (original.isPresent()) {
             Student origStudent = original.get();
-            // Get house
+            // Set house
             House newHouse = student.getHouse();
             Optional<House> house = houseRepository.findById(newHouse.getId());
             house.ifPresent(origStudent::setHouse);
-            // Update student
+            // Update student info
             origStudent.setFirstName(student.getFirstName());
             origStudent.setMiddleName(student.getMiddleName());
             origStudent.setLastName(student.getLastName());
@@ -67,8 +67,15 @@ public class StudentController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Student> deletePerson(@PathVariable int id) {
-        Optional<Student> student = studentRepository.findById(id);
-        studentRepository.deleteById(id);
-        return ResponseEntity.of(student);
+        Optional<Student> studentOptional = studentRepository.findById(id);
+        if( studentOptional.isPresent()) {
+            Student student = studentOptional.get();
+            // Remove student from courses
+            student.getCourses().forEach(course -> course.getStudents().remove(student));
+            // Delete the student entity
+            studentRepository.delete(student);
+        }
+//        studentRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
