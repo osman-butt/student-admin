@@ -1,6 +1,7 @@
 package edu.hogwarts.studentadmin.controllers;
 
-import edu.hogwarts.studentadmin.models.Student;
+import edu.hogwarts.studentadmin.dto.StudentReqDTO;
+import edu.hogwarts.studentadmin.dto.StudentResDTO;
 import edu.hogwarts.studentadmin.services.StudentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,28 +19,27 @@ public class StudentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Student>> getAllStudents() {
+    public ResponseEntity<List<StudentResDTO>> getAllStudents() {
         return ResponseEntity.ok(studentService.getAllStudents());
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Student> getStudent(@PathVariable int id){
-        return ResponseEntity.of(studentService.getStudentById(id));
+    public ResponseEntity<StudentResDTO> getStudent(@PathVariable int id){
+        return ResponseEntity.ok().body(studentService.getStudentById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Student> createStudent(@RequestBody Student student) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(studentService.createStudent(student));
+    public ResponseEntity<StudentResDTO> createStudent(@RequestBody StudentReqDTO studentReqDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(studentService.createStudent(studentReqDTO));
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Student> updateStudent(@PathVariable int id, @RequestBody Student student) {
-        Student updatedStudent = studentService.updateStudent(id,student);
-        return ResponseEntity.ok().body(updatedStudent);
+    public ResponseEntity<StudentResDTO> updateStudent(@PathVariable int id, @RequestBody StudentReqDTO studentReqDTO) {
+        return ResponseEntity.ok().body(studentService.updateStudent(id,studentReqDTO));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Student> deletePerson(@PathVariable int id) {
+    public ResponseEntity<StudentResDTO> deleteStudent(@PathVariable int id) {
         studentService.deleteStudent(id);
         return ResponseEntity.noContent().build();
     }

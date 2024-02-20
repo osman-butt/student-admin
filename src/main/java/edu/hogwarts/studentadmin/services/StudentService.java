@@ -1,14 +1,14 @@
 package edu.hogwarts.studentadmin.services;
 
-import edu.hogwarts.studentadmin.models.Student;
+import edu.hogwarts.studentadmin.dto.StudentReqDTO;
+import edu.hogwarts.studentadmin.dto.StudentResDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface StudentService {
-    Student createStudent(Student student);
-    Optional<Student> getStudentById(int id);
-    List<Student> getAllStudents();
-    Student updateStudent(int id, Student student);
+    StudentResDTO createStudent(StudentReqDTO studentReqDTO);
+    StudentResDTO getStudentById(int id);
+    List<StudentResDTO> getAllStudents();
+    StudentResDTO updateStudent(int id, StudentReqDTO studentReqDTO);
     void deleteStudent(int id);
 }
