@@ -6,13 +6,10 @@ import edu.hogwarts.studentadmin.models.Student;
 import edu.hogwarts.studentadmin.repositories.HouseRepository;
 import edu.hogwarts.studentadmin.repositories.StudentRepository;
 import edu.hogwarts.studentadmin.services.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -41,7 +38,6 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<Student> getAllStudents() {
-//        return studentRepository.findAll().stream().map(studentDTOMapper).collect(Collectors.toList());
         return studentRepository.findAll();
     }
 
@@ -67,6 +63,7 @@ public class StudentServiceImpl implements StudentService {
             origStudent.setEnrollmentYear(student.getEnrollmentYear());
             origStudent.setPrefect(student.isPrefect());
             origStudent.setGraduationYear(student.getGraduationYear());
+            origStudent.setSchoolYear(student.getSchoolYear());
             return studentRepository.save(origStudent);
         } else {
             throw new NotFoundException("Unable to find student with id=" + id);

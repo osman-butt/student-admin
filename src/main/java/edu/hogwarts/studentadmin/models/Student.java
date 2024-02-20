@@ -25,6 +25,7 @@ public class Student {
     @Column(nullable = true)
     private Integer graduationYear;
     private boolean graduated;
+    private int schoolYear;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "students")
@@ -32,7 +33,7 @@ public class Student {
 
     public Student() {}
 
-    public Student(String firstName, String middleName, String lastName, LocalDate dateOfBirth, House house, boolean prefect, int enrollmentYear, Integer graduationYear, boolean graduated) {
+    public Student(String firstName, String middleName, String lastName, LocalDate dateOfBirth, House house, boolean prefect, int enrollmentYear, Integer graduationYear, boolean graduated, int schoolYear) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -42,6 +43,7 @@ public class Student {
         this.enrollmentYear = enrollmentYear;
         this.graduationYear = graduationYear;
         this.graduated = graduated;
+        this.schoolYear = schoolYear;
     }
 
     public int getId() {
@@ -130,5 +132,13 @@ public class Student {
 
     public void setCourses(Set<Course> courses) {
         this.courses = courses;
+    }
+
+    public int getSchoolYear() {
+        return schoolYear;
+    }
+
+    public void setSchoolYear(int schoolYear) {
+        this.schoolYear = schoolYear;
     }
 }
