@@ -1,6 +1,6 @@
 package edu.hogwarts.studentadmin.controllers;
 
-import edu.hogwarts.studentadmin.models.Teacher;
+import edu.hogwarts.studentadmin.dto.TeacherDTO;
 import edu.hogwarts.studentadmin.services.TeacherService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,27 +18,27 @@ public class TeacherController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Teacher>> getAllTeachers() {
+    public ResponseEntity<List<TeacherDTO>> getAllTeachers() {
         return ResponseEntity.ok(teacherService.getAllTeachers());
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Teacher> getTeacher(@PathVariable int id){
-        return ResponseEntity.of(teacherService.getTeacherById(id));
+    public ResponseEntity<TeacherDTO> getTeacher(@PathVariable int id){
+        return ResponseEntity.ok().body(teacherService.getTeacherById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Teacher> createTeacher(@RequestBody Teacher teacher) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(teacherService.createTeacher(teacher));
+    public ResponseEntity<TeacherDTO> createTeacher(@RequestBody TeacherDTO teacherDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(teacherService.createTeacher(teacherDTO));
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Teacher> updateTeacher(@PathVariable int id, @RequestBody Teacher teacher) {
-        return ResponseEntity.ok().body(teacherService.updateTeacher(id,teacher));
+    public ResponseEntity<TeacherDTO> updateTeacher(@PathVariable int id, @RequestBody TeacherDTO teacherDTO) {
+        return ResponseEntity.ok().body(teacherService.updateTeacher(id,teacherDTO));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Teacher> deleteTeacher(@PathVariable int id) {
+    public ResponseEntity<TeacherDTO> deleteTeacher(@PathVariable int id) {
         teacherService.deleteTeacher(id);
         return ResponseEntity.noContent().build();
     }
