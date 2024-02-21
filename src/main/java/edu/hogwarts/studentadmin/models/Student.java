@@ -18,7 +18,7 @@ public class Student {
     private String lastName;
     private LocalDate dateOfBirth;
     @ManyToOne
-    @JoinColumn(name = "house_name", referencedColumnName = "name")
+    @JoinColumn(name = "house", referencedColumnName = "name")
     private House house;
     private boolean prefect;
     private int enrollmentYear;
