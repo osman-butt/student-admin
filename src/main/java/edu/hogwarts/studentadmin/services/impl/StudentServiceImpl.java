@@ -1,10 +1,8 @@
 package edu.hogwarts.studentadmin.services.impl;
 
-import edu.hogwarts.studentadmin.dto.StudentReqDTO;
-import edu.hogwarts.studentadmin.dto.StudentReqDTOMapper;
-import edu.hogwarts.studentadmin.dto.StudentResDTO;
-import edu.hogwarts.studentadmin.dto.StudentResDTOMapper;
+import edu.hogwarts.studentadmin.dto.StudentDTO;
 import edu.hogwarts.studentadmin.exceptions.NotFoundException;
+import edu.hogwarts.studentadmin.mapper.DTOMapper;
 import edu.hogwarts.studentadmin.models.Student;
 import edu.hogwarts.studentadmin.repositories.StudentRepository;
 import edu.hogwarts.studentadmin.services.StudentService;
@@ -16,40 +14,36 @@ import java.util.stream.Collectors;
 @Service
 public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
-    private final StudentResDTOMapper studentResDTOMapper;
-    private final StudentReqDTOMapper studentReqDTOMapper;
+    private final DTOMapper<StudentDTO,Student> studentDTOMapper;
 
-    public StudentServiceImpl(StudentRepository studentRepository, StudentResDTOMapper studentResDTOMapper,StudentReqDTOMapper studentReqDTOMapper) {
+    public StudentServiceImpl(StudentRepository studentRepository, DTOMapper<StudentDTO,Student> studentDTOMapper) {
         this.studentRepository = studentRepository;
-        this.studentResDTOMapper = studentResDTOMapper;
-        this.studentReqDTOMapper = studentReqDTOMapper;
+        this.studentDTOMapper = studentDTOMapper;
     }
 
     @Override
-    public StudentResDTO createStudent(StudentReqDTO studentReqDTO) {
-        // Map DTO to Entity
-        Student student = studentReqDTOMapper.apply(studentReqDTO);
-        return studentResDTOMapper.apply(studentRepository.save(student));
+    public StudentDTO createStudent(StudentDTO studentDTO) {
+        return studentDTOMapper.toDTO(studentRepository.save(studentDTOMapper.toEntity(studentDTO)));
     }
 
     @Override
-    public StudentResDTO getStudentById(int id) {
+    public StudentDTO getStudentById(int id) {
         Student student = studentRepository.findById(id).orElseThrow(() -> new NotFoundException("Unable to find student with id=" + id));
-        return studentResDTOMapper.apply(student);
+        return studentDTOMapper.toDTO(student);
     }
 
     @Override
-    public List<StudentResDTO> getAllStudents() {
-        return studentRepository.findAll().stream().map(studentResDTOMapper).collect(Collectors.toList());
+    public List<StudentDTO> getAllStudents() {
+        return studentRepository.findAll().stream().map(studentDTOMapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
-    public StudentResDTO updateStudent(int id, StudentReqDTO studentReqDTO) {
+    public StudentDTO updateStudent(int id, StudentDTO studentDTO) {
         Student original = studentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Unable to find student with id=" + id));
 
         // Map DTO to entity
-        Student student = studentReqDTOMapper.apply(studentReqDTO);
+        Student student = studentDTOMapper.toEntity(studentDTO);
 
         // Update student information
         original.setFirstName(student.getFirstName());
@@ -64,7 +58,7 @@ public class StudentServiceImpl implements StudentService {
         original.setSchoolYear(student.getSchoolYear());
 
         Student updatedStudent = studentRepository.save(original);
-        return studentResDTOMapper.apply(updatedStudent);
+        return studentDTOMapper.toDTO(updatedStudent);
     }
 
     @Override
