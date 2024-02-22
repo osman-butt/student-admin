@@ -1,81 +1,45 @@
 package edu.hogwarts.studentadmin.controllers;
 
-import edu.hogwarts.studentadmin.models.House;
-import edu.hogwarts.studentadmin.models.Student;
-import edu.hogwarts.studentadmin.models.Teacher;
-import edu.hogwarts.studentadmin.repositories.HouseRepository;
-import edu.hogwarts.studentadmin.repositories.TeacherRepository;
+import edu.hogwarts.studentadmin.dto.TeacherDTO;
+import edu.hogwarts.studentadmin.services.TeacherService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/teachers")
 public class TeacherController {
-    private final TeacherRepository teacherRepository;
-    private final HouseRepository houseRepository;
+    private final TeacherService teacherService;
 
-    public TeacherController(TeacherRepository teacherRepository, HouseRepository houseRepository) {
-        this.teacherRepository = teacherRepository;
-        this.houseRepository = houseRepository;
+    public TeacherController(TeacherService teacherService) {
+        this.teacherService = teacherService;
     }
 
     @GetMapping
-    public ResponseEntity<List<Teacher>> getAllTeachers() {
-        List<Teacher> teachers = teacherRepository.findAll();
-        return ResponseEntity.ok(teachers);
+    public ResponseEntity<List<TeacherDTO>> getAllTeachers() {
+        return ResponseEntity.ok(teacherService.getAllTeachers());
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Teacher> getTeacher(@PathVariable int id){
-        Optional<Teacher> teacher = teacherRepository.findById(id);
-        return ResponseEntity.of(teacher);
+    public ResponseEntity<TeacherDTO> getTeacher(@PathVariable int id){
+        return ResponseEntity.ok().body(teacherService.getTeacherById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Teacher> createTeacher(@RequestBody Teacher teacher) {
-        Teacher newTeacher = teacherRepository.save(teacher);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newTeacher);
+    public ResponseEntity<TeacherDTO> createTeacher(@RequestBody TeacherDTO teacherDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(teacherService.createTeacher(teacherDTO));
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Teacher> updateTeacher(@PathVariable int id, @RequestBody Teacher teacher) {
-        Optional<Teacher> original = teacherRepository.findById(id);
-        if(original.isPresent()) {
-            Teacher origTeacher = original.get();
-            // Get house
-            House newHouse = teacher.getHouse();
-            Optional<House> house = houseRepository.findById(newHouse.getId());
-            house.ifPresent(origTeacher::setHouse);
-            // Update Teacher
-            origTeacher.setFirstName(teacher.getFirstName());
-            origTeacher.setMiddleName(teacher.getMiddleName());
-            origTeacher.setLastName(teacher.getLastName());
-            origTeacher.setEmployment(teacher.getEmployment());
-            origTeacher.setDateOfBirth(teacher.getDateOfBirth());
-            origTeacher.setEmploymentEnd(teacher.getEmploymentEnd());
-            origTeacher.setEmploymentStart(teacher.getEmploymentStart());
-            origTeacher.setHeadOfHouse(teacher.isHeadOfHouse());
-            Teacher updatedTeacher = teacherRepository.save(origTeacher);
-            return ResponseEntity.ok().body(updatedTeacher);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<TeacherDTO> updateTeacher(@PathVariable int id, @RequestBody TeacherDTO teacherDTO) {
+        return ResponseEntity.ok().body(teacherService.updateTeacher(id,teacherDTO));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Teacher> deleteTeacher(@PathVariable int id) {
-        Optional<Teacher> teacherOptional = teacherRepository.findById(id);
-        if( teacherOptional.isPresent()) {
-            Teacher teacher = teacherOptional.get();
-            // Remove student from courses
-            teacher.getCourses().forEach(course -> course.setTeacher(null));
-            // Delete the student entity
-            teacherRepository.delete(teacher);
-        }
+    public ResponseEntity<TeacherDTO> deleteTeacher(@PathVariable int id) {
+        teacherService.deleteTeacher(id);
         return ResponseEntity.noContent().build();
     }
 }

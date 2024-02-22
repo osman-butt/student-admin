@@ -17,7 +17,7 @@ public class Teacher {
     private String lastName;
     private LocalDate dateOfBirth;
     @ManyToOne
-    @JoinColumn(name = "house_id", referencedColumnName = "id")
+    @JoinColumn(name = "house", referencedColumnName = "name")
     private House house;
     private boolean headOfHouse;
     private EmpType employment;
