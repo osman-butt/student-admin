@@ -2,48 +2,50 @@ package edu.hogwarts.studentadmin.services.impl;
 
 import edu.hogwarts.studentadmin.dto.StudentDTO;
 import edu.hogwarts.studentadmin.exceptions.NotFoundException;
-import edu.hogwarts.studentadmin.mapper.DTOMapper;
+import edu.hogwarts.studentadmin.models.House;
 import edu.hogwarts.studentadmin.models.Student;
 import edu.hogwarts.studentadmin.repositories.StudentRepository;
+import edu.hogwarts.studentadmin.services.HouseService;
 import edu.hogwarts.studentadmin.services.StudentService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
-    private final DTOMapper<StudentDTO,Student> studentDTOMapper;
+    private final HouseService houseService;
 
-    public StudentServiceImpl(StudentRepository studentRepository, DTOMapper<StudentDTO,Student> studentDTOMapper) {
+    public StudentServiceImpl(StudentRepository studentRepository,HouseService houseService) {
         this.studentRepository = studentRepository;
-        this.studentDTOMapper = studentDTOMapper;
+        this.houseService = houseService;
     }
 
     @Override
-    public StudentDTO createStudent(StudentDTO studentDTO) {
-        return studentDTOMapper.toDTO(studentRepository.save(studentDTOMapper.toEntity(studentDTO)));
+    public StudentDTO create(StudentDTO studentDTO) {
+        return toDTO(studentRepository.save(toEntity(studentDTO)));
     }
 
     @Override
-    public StudentDTO getStudentById(int id) {
-        Student student = studentRepository.findById(id).orElseThrow(() -> new NotFoundException("Unable to find student with id=" + id));
-        return studentDTOMapper.toDTO(student);
+    public Optional<StudentDTO> findById(int id) {
+        Optional<Student> optionalStudent = studentRepository.findById(id);
+        return optionalStudent.map(this::toDTO);
     }
 
     @Override
-    public List<StudentDTO> getAllStudents() {
-        return studentRepository.findAll().stream().map(studentDTOMapper::toDTO).collect(Collectors.toList());
+    public List<StudentDTO> findAll() {
+        return studentRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Override
-    public StudentDTO updateStudent(int id, StudentDTO studentDTO) {
+    public StudentDTO update(int id, StudentDTO studentDTO) {
         Student original = studentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Unable to find student with id=" + id));
 
         // Map DTO to entity
-        Student student = studentDTOMapper.toEntity(studentDTO);
+        Student student = toEntity(studentDTO);
 
         // Update student information
         original.setFirstName(student.getFirstName());
@@ -58,7 +60,7 @@ public class StudentServiceImpl implements StudentService {
         original.setSchoolYear(student.getSchoolYear());
 
         Student updatedStudent = studentRepository.save(original);
-        return studentDTOMapper.toDTO(updatedStudent);
+        return toDTO(updatedStudent);
     }
 
     @Override
@@ -69,5 +71,52 @@ public class StudentServiceImpl implements StudentService {
         student.getCourses().forEach(course -> course.getStudents().remove(student));
         // Delete the student entity
         studentRepository.delete(student);
+    }
+
+    public List<StudentDTO> findByFullName(String firstName, String middleName, String lastName) {
+        List<Student> studentMatch;
+        String searchName;
+        if (firstName != null && middleName != null && lastName != null) {
+            studentMatch = studentRepository.findByFirstNameAndMiddleNameAndLastName(firstName,middleName,lastName);
+        } else if (firstName != null && middleName == null && lastName != null) {
+            studentMatch = studentRepository.findByFirstNameAndLastName(firstName,lastName);
+        } else {
+            studentMatch = studentRepository.findByFirstName(firstName);
+        }
+        return studentMatch.stream().map(this::toDTO).toList();
+    }
+
+    @Override
+    public Student toEntity(StudentDTO dto) {
+        House house = dto.getHouse() == null ? null : houseService.findById(dto.getHouse()).map(houseService::toEntity).orElse(null);
+        return new Student(
+                dto.getId(),
+                dto.getFirstName(),
+                dto.getMiddleName(),
+                dto.getLastName(),
+                dto.getDateOfBirth(),
+                house,
+                dto.isPrefect(),
+                dto.getEnrollmentYear(),
+                dto.getGraduationYear(),
+                dto.isGraduated(),
+                dto.getSchoolYear()
+        );
+    }
+
+    @Override
+    public StudentDTO toDTO(Student entity) {
+        return new StudentDTO(
+                entity.getId(),
+                entity.getFirstName(),
+                entity.getMiddleName(),
+                entity.getLastName(),
+                entity.getDateOfBirth(),
+                entity.getHouse().getName(),
+                entity.isPrefect(),
+                entity.getEnrollmentYear(),
+                entity.getGraduationYear(),
+                entity.isGraduated(),
+                entity.getSchoolYear());
     }
 }

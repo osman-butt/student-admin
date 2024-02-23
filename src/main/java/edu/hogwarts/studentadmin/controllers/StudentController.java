@@ -1,6 +1,7 @@
 package edu.hogwarts.studentadmin.controllers;
 
 import edu.hogwarts.studentadmin.dto.StudentDTO;
+import edu.hogwarts.studentadmin.exceptions.NotFoundException;
 import edu.hogwarts.studentadmin.services.StudentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,22 +20,22 @@ public class StudentController {
 
     @GetMapping
     public ResponseEntity<List<StudentDTO>> getAllStudents() {
-        return ResponseEntity.ok(studentService.getAllStudents());
+        return ResponseEntity.ok(studentService.findAll());
     }
 
     @GetMapping("{id}")
     public ResponseEntity<StudentDTO> getStudent(@PathVariable int id){
-        return ResponseEntity.ok().body(studentService.getStudentById(id));
+        return ResponseEntity.ok().body(studentService.findById(id).orElseThrow(() -> new NotFoundException("Unable to find student with id=" + id)));
     }
 
     @PostMapping
     public ResponseEntity<StudentDTO> createStudent(@RequestBody StudentDTO studentDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(studentService.createStudent(studentDTO));
+        return ResponseEntity.status(HttpStatus.CREATED).body(studentService.create(studentDTO));
     }
 
     @PutMapping("{id}")
     public ResponseEntity<StudentDTO> updateStudent(@PathVariable int id, @RequestBody StudentDTO studentDTO) {
-        return ResponseEntity.ok().body(studentService.updateStudent(id,studentDTO));
+        return ResponseEntity.ok().body(studentService.update(id,studentDTO));
     }
 
     @DeleteMapping("{id}")

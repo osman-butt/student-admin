@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 public class StudentDTO {
-    private final int id;
+    private int id;
     private String firstName;
     private String middleName;
     private String lastName;
@@ -38,6 +38,10 @@ public class StudentDTO {
         this.firstName = names[0];
         this.middleName = names[1];
         this.lastName = names[2];
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     private String[] nameParts(String fullName) {

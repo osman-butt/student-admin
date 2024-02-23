@@ -46,6 +46,20 @@ public class Student {
         this.schoolYear = schoolYear;
     }
 
+    public Student(int id, String firstName, String middleName, String lastName, LocalDate dateOfBirth, House house, boolean prefect, int enrollmentYear, Integer graduationYear, boolean graduated, int schoolYear) {
+        this.id = id;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.house = house;
+        this.prefect = prefect;
+        this.enrollmentYear = enrollmentYear;
+        this.graduationYear = graduationYear;
+        this.graduated = graduated;
+        this.schoolYear = schoolYear;
+    }
+
     public int getId() {
         return id;
     }
