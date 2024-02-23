@@ -1,6 +1,7 @@
 package edu.hogwarts.studentadmin.controllers;
 
 import edu.hogwarts.studentadmin.dto.HouseDTO;
+import edu.hogwarts.studentadmin.exceptions.NotFoundException;
 import edu.hogwarts.studentadmin.services.HouseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +23,11 @@ public class HouseController {
 
     @GetMapping
     public ResponseEntity<List<HouseDTO>> getAllHouses() {
-        return ResponseEntity.ok(houseService.getAllHouses());
+        return ResponseEntity.ok(houseService.findAll());
     }
 
     @GetMapping("/{name}")
     public ResponseEntity<HouseDTO> getHouseByName(@PathVariable String name) {
-        return ResponseEntity.ok(houseService.getHouseByName(name));
+        return ResponseEntity.ok(houseService.findById(name).orElseThrow(() -> new NotFoundException("Unable to find house with name " + name)));
     }
 }
