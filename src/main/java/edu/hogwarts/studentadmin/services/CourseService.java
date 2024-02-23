@@ -9,16 +9,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public interface CourseService {
-    List<CourseDTO> getAllCourses();
-    CourseDTO getCourseById(int id);
-    Teacher getTeacherFromCourse(int id);
-    Set<Student> getCourseStudentsById(int id);
-    CourseDTO createCourse(CourseDTO courseDTO);
-    CourseDTO updateCourse(int id, CourseDTO courseDTO);
-    CourseDTO updateCourseTeacher(int id, int teacherId);
-    CourseDTO addStudentToCourse(int id, int studentId);
-    void deleteCourse(int id);
-    CourseDTO removeTeacherFromCourse(int id);
-    CourseDTO removeStudentFromCourse(int id, int studentId);
+public interface CourseService extends Service<CourseDTO, Course> {
+    List<CourseDTO> findAll();
+    Optional<CourseDTO> findById(int id);
+    Teacher findTeacherById(int id);
+    Set<Student> findStudentsById(int id);
+    CourseDTO create(CourseDTO courseDTO);
+    CourseDTO update(int id, CourseDTO courseDTO);
+    CourseDTO updateTeacher(int id, int teacherId);
+    CourseDTO addStudent(int id, int studentId);
+    CourseDTO addStudents(int id, CourseDTO courseDTO);
+    void delete(int id);
+    CourseDTO deleteTeacher(int id);
+    CourseDTO deleteStudent(int id, int studentId);
 }

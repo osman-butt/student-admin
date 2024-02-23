@@ -4,12 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CourseDTO {
-    private int id;
-    private String subject;
-    private int schoolYear;
-    private boolean current;
-    private TeacherDTO teacher;
-    private Set<StudentDTO> students = new HashSet<>();
+    private final int id;
+    private final String subject;
+    private final int schoolYear;
+    private final boolean current;
+    private final TeacherDTO teacher;
+    private final Set<StudentDTO> students;
 
     public CourseDTO(int id, String subject, int schoolYear, boolean current, TeacherDTO teacher, Set<StudentDTO> students) {
         this.id = id;
