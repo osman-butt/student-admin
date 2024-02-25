@@ -2,6 +2,8 @@ package edu.hogwarts.studentadmin.services.impl;
 
 import edu.hogwarts.studentadmin.dto.CourseDTO;
 import edu.hogwarts.studentadmin.dto.StudentDTO;
+import edu.hogwarts.studentadmin.dto.TeacherDTO;
+import edu.hogwarts.studentadmin.exceptions.BadRequestException;
 import edu.hogwarts.studentadmin.exceptions.NotFoundException;
 import edu.hogwarts.studentadmin.models.Course;
 import edu.hogwarts.studentadmin.models.Student;
@@ -40,11 +42,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Teacher findTeacherById(int id) {
+    public TeacherDTO findTeacherById(int id) {
         Optional<Course> courseOptional = courseRepository.findById(id);
         if (courseOptional.isPresent()) {
             Course course = courseOptional.get();
-            return course.getTeacher();
+            return teacherService.toDTO(course.getTeacher());
         } else {
             // Handle case where course is not found
             throw new NotFoundException("Unable to find course with id=" + id);
@@ -52,11 +54,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Set<Student> findStudentsById(int id) {
+    public Set<StudentDTO> findStudentsById(int id) {
         Optional<Course> courseOptional = courseRepository.findById(id);
         if (courseOptional.isPresent()) {
             Course course = courseOptional.get();
-            return course.getStudents();
+            return course.getStudents().stream().map(studentService::toDTO).collect(Collectors.toSet());
         } else {
             // Handle case where course is not found
             throw new NotFoundException("Unable to find course with id=" + id);
@@ -108,64 +110,52 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseDTO addStudent(int id, int studentId) {
         Course course = courseRepository.findById(id).orElseThrow(() -> new NotFoundException("Unable to find course with id=" + id));
-        // Check if student is already enrolled
-        if(isStudentEnrolled(course.getStudents(),studentId)) {
-            return toDTO(course);
-        } else {
-            Set<Student> newStudentList = course.getStudents();
-            Student student = studentService.toEntity(
-                    studentService.findById(studentId)
-                            .orElseThrow(() -> new NotFoundException("Unable to find course with id=" + id))
-            );
-            newStudentList.add(student);
-            course.setStudents(newStudentList);
-            return toDTO(courseRepository.save(course));
-        }
+        StudentDTO studentDTO = new StudentDTO(studentId,null, null,null,null,null, false, 0, null,false,0);
+        addStudentToCourseObj(course,studentDTO);
+        return toDTO(courseRepository.save(course));
     }
 
     @Override
     public CourseDTO addStudents(int id, CourseDTO courseDTO) {
         Course course = courseRepository.findById(id).orElseThrow(() -> new NotFoundException("Unable to find course with id=" + id));
-        // Todo
-        // Get  students
-        int addedStudents = 0;
-        Set<Student> students = courseDTO.getStudents().stream().map(studentService::toEntity).collect(Collectors.toSet());
-        for (Student student : students) {
-            Student matchedStudent;
-            if (student.getId() == 0) {
-                List<StudentDTO> studentDTO = studentService.findByFullName(student.getFirstName(),student.getMiddleName(),student.getLastName());
-                if(studentDTO.size() == 1) {
-                    matchedStudent = studentService.toEntity(studentDTO.get(0));
-                } else {
-                    throw new NotFoundException("Unable to uniquely identify students. Use id or provide the fullname");
-                }
-            } else {
-                matchedStudent = studentService.toEntity(
-                        studentService.findById(student.getId())
-                                .orElseThrow(() -> new NotFoundException("Unable to find course with id=" + student.getId()))
-                );
-            }
-            // Is student eligible for course (same schoolYear)
-            if(matchedStudent.getSchoolYear() != course.getSchoolYear()) {
-                // Todo
-                // Add proper error handling
-                throw new NotFoundException("Could not add students. Some of the students does not have the same school year as course");
-            }
-            // If not enrolled, add student to course
-            if(!isStudentEnrolled(course.getStudents(),matchedStudent.getId())) {
-                course.addStudent(matchedStudent);
-                ++addedStudents;
-            }
+        Set<StudentDTO> studentDTOs = courseDTO.getStudents();
+        for (StudentDTO studentDTO : studentDTOs) {
+            addStudentToCourseObj(course,studentDTO);
         }
-        if (addedStudents>0) {
-            Course updatedCourse = courseRepository.save(course);
-            return toDTO(updatedCourse);
+        return toDTO(courseRepository.save(course));
+    }
+
+    /**
+     * Adds a student to the specified course if the student is not already enrolled
+     * and meets the eligibility criteria based on school year.
+     *
+     * @param course The course to which the student will be added.
+     * @param studentDTO The DTO representing the student to be added.
+     */
+    private void addStudentToCourseObj(Course course, StudentDTO studentDTO) {
+        Optional<StudentDTO> existingStudentOptional = studentService.findOneByIdOrFullName(studentDTO);
+        Set<Student> studentsEnrolled = course.getStudents();
+        if(existingStudentOptional.isPresent()) {
+            Student exisitingStudent = studentService.toEntity(existingStudentOptional.get());
+            boolean isEnrolled = isStudentEnrolled(studentsEnrolled,exisitingStudent.getId());
+            boolean isEligible = isStudentEligibleForCourse(course.getSchoolYear(), exisitingStudent.getSchoolYear());
+            if (!isEligible) throw new BadRequestException(
+                    "Student "+exisitingStudent.getFirstName()
+                    + " "+exisitingStudent.getLastName() + " (id="+ exisitingStudent.getId() +") is not from same school year as course.");
+            if (!isEnrolled) course.addStudent(exisitingStudent);
         } else {
-            // Todo
-            // Add proper error handling
-            throw new NotFoundException("All students are already enrolled.");
+            throw new NotFoundException("Student(s) not found, make sure to specify correct id or name");
         }
     }
+
+    private boolean isStudentEligibleForCourse(int courseSchoolYear, int studentSchoolYear) {
+        return courseSchoolYear == studentSchoolYear;
+    }
+
+    private boolean isStudentEnrolled(Set<Student> students, int studentId) {
+        return students.stream().anyMatch(student -> student.getId() == studentId);
+    }
+
 
     @Override
     public void delete(int id) {
@@ -194,11 +184,6 @@ public class CourseServiceImpl implements CourseService {
             throw new NotFoundException("Student with id=" + studentId + " is not enrolled.");
         }
     }
-
-    private boolean isStudentEnrolled(Set<Student> students, int id) {
-        return students.stream().anyMatch(student -> student.getId() == id);
-    }
-
 
     @Override
     public Course toEntity(CourseDTO dto) {
