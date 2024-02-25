@@ -19,4 +19,4 @@ jobs:
           java-version: '17'
 
       - name: Maven test
-        run: mvn test
+        run: mvn test -Dspring.profiles.active=test
