@@ -1,6 +1,8 @@
 package edu.hogwarts.studentadmin.controllers;
 
 import edu.hogwarts.studentadmin.dto.CourseDTO;
+import edu.hogwarts.studentadmin.dto.StudentDTO;
+import edu.hogwarts.studentadmin.dto.TeacherDTO;
 import edu.hogwarts.studentadmin.exceptions.NotFoundException;
 import edu.hogwarts.studentadmin.models.Student;
 import edu.hogwarts.studentadmin.models.Teacher;
@@ -31,12 +33,12 @@ public class CourseController {
     }
 
     @GetMapping("{id}/teacher")
-    public ResponseEntity<Teacher> getCourseTeacher(@PathVariable int id) {
+    public ResponseEntity<TeacherDTO> getCourseTeacher(@PathVariable int id) {
         return ResponseEntity.ok(courseService.findTeacherById(id));
     }
 
     @GetMapping("{id}/students")
-    public ResponseEntity<Set<Student>> getCourseStudents(@PathVariable int id) {
+    public ResponseEntity<Set<StudentDTO>> getCourseStudents(@PathVariable int id) {
         return ResponseEntity.ok(courseService.findStudentsById(id));
     }
 
