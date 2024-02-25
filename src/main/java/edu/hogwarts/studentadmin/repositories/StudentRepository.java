@@ -2,13 +2,17 @@ package edu.hogwarts.studentadmin.repositories;
 
 import edu.hogwarts.studentadmin.models.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface StudentRepository extends JpaRepository<Student,Integer> {
-    List<Student> findByFirstNameAndMiddleNameAndLastName(String firstName, String middleName, String lastName);
-    List<Student> findByFirstNameAndLastName(String firstName,String lastName);
-    List<Student> findByFirstNameAndMiddleName(String firstName,String middleName);
-    List<Student> findByMiddleNameAndLastName(String middleName, String lastName);
-    List<Student> findByFirstName(String firstName);
+    @Query("SELECT s FROM Student s " +
+            "WHERE (:firstName IS NOT NULL OR s.firstName = :firstName) " +
+            "AND (:middleName IS NULL OR s.middleName = :middleName OR s.middleName IS NULL) " +
+            "AND (:lastName IS NULL OR s.lastName = :lastName OR s.middleName IS NULL)")
+    List<Student> findByFullName(@Param("firstName") String firstName,
+                                 @Param("middleName") String middleName,
+                                 @Param("lastName") String lastName);
 }

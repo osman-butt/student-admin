@@ -74,16 +74,17 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public List<StudentDTO> findByFullName(String firstName, String middleName, String lastName) {
-        List<Student> studentMatch;
-        String searchName;
-        if (firstName != null && middleName != null && lastName != null) {
-            studentMatch = studentRepository.findByFirstNameAndMiddleNameAndLastName(firstName,middleName,lastName);
-        } else if (firstName != null && middleName == null && lastName != null) {
-            studentMatch = studentRepository.findByFirstNameAndLastName(firstName,lastName);
+        List<Student> students = studentRepository.findByFullName(firstName,middleName,lastName);
+        return students.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    public Optional<StudentDTO> findOneByFullName(String firstName, String middleName, String lastName) {
+        List<Student> students = studentRepository.findByFullName(firstName,middleName,lastName);
+        if (students.size() == 1) {
+            return Optional.of(toDTO(students.get(0)));
         } else {
-            studentMatch = studentRepository.findByFirstName(firstName);
+            return Optional.empty();
         }
-        return studentMatch.stream().map(this::toDTO).toList();
     }
 
     @Override
