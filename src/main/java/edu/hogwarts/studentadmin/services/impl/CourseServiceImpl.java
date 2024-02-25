@@ -129,10 +129,7 @@ public class CourseServiceImpl implements CourseService {
         // Todo
         // Get  students
         int addedStudents = 0;
-        Set<Student> students = toEntity(courseDTO).getStudents();
-        for (Student s : students) {
-            System.out.println(s.getId());
-        }
+        Set<Student> students = courseDTO.getStudents().stream().map(studentService::toEntity).collect(Collectors.toSet());
         for (Student student : students) {
             Student matchedStudent;
             if (student.getId() == 0) {
