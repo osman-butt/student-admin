@@ -73,17 +73,25 @@ public class StudentServiceImpl implements StudentService {
         studentRepository.delete(student);
     }
 
-    public List<StudentDTO> findByFullName(String firstName, String middleName, String lastName) {
-        List<Student> studentMatch;
-        String searchName;
-        if (firstName != null && middleName != null && lastName != null) {
-            studentMatch = studentRepository.findByFirstNameAndMiddleNameAndLastName(firstName,middleName,lastName);
-        } else if (firstName != null && middleName == null && lastName != null) {
-            studentMatch = studentRepository.findByFirstNameAndLastName(firstName,lastName);
+    private Optional<StudentDTO> findOneByFullName(String firstName, String middleName, String lastName) {
+        List<Student> students = studentRepository.findByFullName(firstName,middleName,lastName);
+        if (students.size() == 1) {
+            return Optional.of(toDTO(students.get(0)));
         } else {
-            studentMatch = studentRepository.findByFirstName(firstName);
+            return Optional.of(null);
         }
-        return studentMatch.stream().map(this::toDTO).toList();
+    }
+
+    @Override
+    public Optional<StudentDTO> findOneByIdOrFullName(StudentDTO studentDTO) {
+        if(studentDTO.getId() != 0) {
+            Optional<Student> studentOptional = studentRepository.findById(studentDTO.getId());
+            return studentOptional.map(this::toDTO);
+        } else if (studentDTO.getFirstName() != null) {
+            return findOneByFullName(studentDTO.getFirstName(),studentDTO.getMiddleName(),studentDTO.getLastName());
+        } else {
+            return Optional.of(null);
+        }
     }
 
     @Override

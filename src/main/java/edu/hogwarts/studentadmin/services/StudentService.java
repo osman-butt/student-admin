@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface StudentService extends Service<StudentDTO,Student> {
     StudentDTO create(StudentDTO studentDTO);
     Optional<StudentDTO> findById(int id);
-    List<StudentDTO> findByFullName(String firstName, String middleName, String lastName);
+    Optional<StudentDTO> findOneByIdOrFullName(StudentDTO studentDTO);
     List<StudentDTO> findAll();
     StudentDTO update(int id, StudentDTO studentDTO);
     void deleteStudent(int id);
