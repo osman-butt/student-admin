@@ -1,9 +1,11 @@
 package edu.hogwarts.studentadmin.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import edu.hogwarts.studentadmin.dto.CourseDTO;
 import edu.hogwarts.studentadmin.dto.StudentDTO;
+import edu.hogwarts.studentadmin.exceptions.BadRequestException;
 import edu.hogwarts.studentadmin.models.*;
 import edu.hogwarts.studentadmin.repositories.CourseRepository;
 import edu.hogwarts.studentadmin.services.StudentService;
@@ -17,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -34,7 +35,7 @@ public class CourseServiceTest {
     private CourseServiceImpl courseService;
 
     @Test
-    public void testAddStudents() {
+    public void Test_addStudents_SUCCES() {
         House gryffindor = new House("Gryffindor","Godric Gryffindor",new HouseColor(ColorType.RED,ColorType.YELLOW));
         // Mock Student data
         Student student1 = new Student(1,"Harry",null,"Potter", LocalDate.parse("1990-01-01"),gryffindor,false,2000,null,false,1);
@@ -85,5 +86,52 @@ public class CourseServiceTest {
 
         // Assert
         Assertions.assertThat(result.getStudents().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void Test_addStudents_NOT_ELIGIBLE() {
+        House gryffindor = new House("Gryffindor","Godric Gryffindor",new HouseColor(ColorType.RED,ColorType.YELLOW));
+        // Mock Student data
+        Student student1 = new Student(1,"Harry",null,"Potter", LocalDate.parse("1990-01-01"),gryffindor,false,2000,null,false,2);
+        Student student2 = new Student(2,"Ron",null,"Weasley", LocalDate.parse("1990-01-01"),gryffindor,false,2000,null,false,1);
+
+        // Mock StudentDTOs
+        StudentDTO studentDTO1 = new StudentDTO(1,null,null,null,null,null,false,0,null,false,2);
+        StudentDTO studentDTO2 = new StudentDTO(2,null,null,null,null,null,false,0,null,false,1);;
+
+
+        // Mock Course data
+        int courseId = 1;
+
+        Course courseFromDB = new Course();
+        courseFromDB.setId(courseId);
+        courseFromDB.setSchoolYear(1);
+        courseFromDB.setCurrent(false);
+        courseFromDB.setSubject("Potions");
+        courseFromDB.addStudent(student2);
+
+        // Mock method input course
+        CourseDTO courseDTO = new CourseDTO(
+                courseId,
+                "Potions",
+                1,
+                false,
+                null,
+                Set.of(studentDTO1));
+
+
+
+        // Mock behavior
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(courseFromDB));
+        when(studentService.findOneByIdOrFullName(studentDTO1)).thenReturn(Optional.of(studentDTO1));
+        when(studentService.toEntity(studentDTO1)).thenReturn(student1);
+
+        // Call the method and verify if it throws a BadRequestException
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+            courseService.addStudents(courseId, courseDTO);
+        });
+
+        // Verify the exception message if needed
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Student Harry Potter (id=1) is not from same school year as course.");
     }
 }
