@@ -165,7 +165,7 @@ public class CourseServiceTest {
 
         // Mock behavior
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(courseFromDB));
-        when(studentService.findOneByIdOrFullName(studentDTO1)).thenReturn(Optional.empty());
+//        when(studentService.findOneByIdOrFullName(studentDTO1)).thenReturn(Optional.empty());
 
 
         // Call the method and verify if it throws a BadRequestException
