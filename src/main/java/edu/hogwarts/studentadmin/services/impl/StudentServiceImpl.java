@@ -78,7 +78,7 @@ public class StudentServiceImpl implements StudentService {
         if (students.size() == 1) {
             return Optional.of(toDTO(students.get(0)));
         } else {
-            return Optional.of(null);
+            return Optional.empty();
         }
     }
 
@@ -90,7 +90,7 @@ public class StudentServiceImpl implements StudentService {
         } else if (studentDTO.getFirstName() != null) {
             return findOneByFullName(studentDTO.getFirstName(),studentDTO.getMiddleName(),studentDTO.getLastName());
         } else {
-            return Optional.of(null);
+            return Optional.empty();
         }
     }
 
