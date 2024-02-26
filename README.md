@@ -24,7 +24,7 @@ To run the application locally:
    spring.datasource.username=${DB_USER}
    spring.datasource.password=${DB_PASS}
    ```
-5. Build and run the application using dev spring boot profile _dev_ (=populates db with predefined data):
+5. Build and run the application using spring boot profile _dev_ (=populates db with predefined data):
    ```
    ./mvnw spring-boot:run -Dspring.profiles.active=dev
    ```
