@@ -6,12 +6,14 @@ import edu.hogwarts.studentadmin.repositories.HouseRepository;
 import edu.hogwarts.studentadmin.repositories.StudentRepository;
 import edu.hogwarts.studentadmin.repositories.TeacherRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 @Component
+@Profile({"test", "dev"})
 public class InitData implements CommandLineRunner {
 
     private final CourseRepository courseRepository;
