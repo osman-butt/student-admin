@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import edu.hogwarts.studentadmin.dto.CourseDTO;
 import edu.hogwarts.studentadmin.dto.StudentDTO;
 import edu.hogwarts.studentadmin.exceptions.BadRequestException;
+import edu.hogwarts.studentadmin.exceptions.NotFoundException;
 import edu.hogwarts.studentadmin.models.*;
 import edu.hogwarts.studentadmin.repositories.CourseRepository;
 import edu.hogwarts.studentadmin.services.StudentService;
@@ -133,5 +134,76 @@ public class CourseServiceTest {
 
         // Verify the exception message if needed
         Assertions.assertThat(exception.getMessage()).isEqualTo("Student Harry Potter (id=1) is not from same school year as course.");
+    }
+
+    @Test
+    public void Test_addStudents_student_NOT_FOUND() {
+        // Mock StudentDTOs
+        StudentDTO studentDTO1 = new StudentDTO(1,null,null,null,null,null,false,0,null,false,1);
+        StudentDTO studentDTO2 = new StudentDTO(2,null,null,null,null,null,false,0,null,false,1);;
+
+
+        // Mock Course data
+        int courseId = 1;
+
+        Course courseFromDB = new Course();
+        courseFromDB.setId(courseId);
+        courseFromDB.setSchoolYear(1);
+        courseFromDB.setCurrent(false);
+        courseFromDB.setSubject("Potions");
+
+        // Mock method input course
+        CourseDTO courseDTO = new CourseDTO(
+                courseId,
+                "Potions",
+                1,
+                false,
+                null,
+                Set.of(studentDTO1,studentDTO2));
+
+
+
+        // Mock behavior
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(courseFromDB));
+        when(studentService.findOneByIdOrFullName(studentDTO1)).thenReturn(Optional.empty());
+
+
+        // Call the method and verify if it throws a BadRequestException
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            courseService.addStudents(courseId, courseDTO);
+        });
+        // Verify the exception message if needed
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Student(s) not found, make sure to specify correct id or name");
+    }
+
+    @Test
+    public void Test_addStudents_course_NOT_FOUND() {
+        // Mock Course data
+        int courseId = 1;
+
+        Course courseFromDB = new Course();
+        courseFromDB.setId(courseId);
+
+        // Mock method input course
+        CourseDTO courseDTO = new CourseDTO(
+                courseId,
+                "Potions",
+                1,
+                false,
+                null,
+                Set.of());
+
+
+
+        // Mock behavior
+        when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
+
+
+        // Call the method and verify if it throws a BadRequestException
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            courseService.addStudents(courseId, courseDTO);
+        });
+        // Verify the exception message if needed
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Unable to find course with id=1");
     }
 }
